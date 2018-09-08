@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.qfedu.mapper.GoodsMapper">
+    <resultMap id="BaseResultMap" type="com.qfedu.pojo.Goods">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="pubdate" property="pubdate" jdbcType="DATE"/>
+        <result column="price" property="price" jdbcType="BIGINT"/>
+        <result column="star" property="star" jdbcType="INTEGER"/>
+        <result column="pic" property="pic" jdbcType="VARCHAR"/>
+        <result column="flag" property="flag" jdbcType="INTEGER"/>
+        <result column="cid" property="cid" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="INTEGER"/>
+    </resultMap>
+    <resultMap id="ResultMapWithBLOBs" type="com.qfedu.pojo.Goods" extends="BaseResultMap">
+        <result column="info" property="info" jdbcType="LONGVARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, pubdate, price, star, pic, flag, cid, uid
+  </sql>
+    <sql id="Blob_Column_List">
+    info
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from goods
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+
+    <resultMap id="goodsMap" type="Goods">
+        <id property="id" column="id"></id>
+        <result column="name" property="name"></result>
+        <result column="pubdate" property="pubdate"></result>
+        <result column="price" property="price"></result>
+        <result column="star" property="star"></result>
+        <result column="pic" property="pic"></result>
+        <result column="flag" property="flag"></result>
+        <result column="cid" property="cid"></result>
+        <result column="uid" property="uid"></result>
+        <result column="info" property="info"></result>
+        <association property="category" javaType="Category">
+            <id property="id" column="id"></id>
+            <result property="cname" column="cname"></result>
+            <result property="level" column="level"></result>
+            <result property="parentid" column="parentid"></result>
+        </association>
+
+    </resultMap>
+    <resultMap id="goodsVoMap" type="GoodsVo">
+        <result column="cname" property="cname"></result>
+        <collection property="goods" ofType="Goods">
+            <id property="id" column="id"></id>
+            <result column="name" property="name"></result>
+            <result column="pubdate" property="pubdate"></result>
+            <result column="price" property="price"></result>
+            <result column="star" property="star"></result>
+            <result column="pic" property="pic"></result>
+            <result column="flag" property="flag"></result>
+            <result column="cid" property="cid"></result>
+            <result column="uid" property="uid"></result>
+            <result column="info" property="info"></result>
+        </collection>
+    </resultMap>
+
+    <select id="selectAllactive" resultMap="goodsVoMap">
+        select g.*,c.cname from goods g left join category c on g.cid=c.id
+        <where>
+            <if test="name != null and name != ''">
+              name like "%"#{name}"%"
+            </if>
+            <if test="pubdate != null and pubdate != ''">
+               and pubdate = #{pubdate}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.qfedu.pojo.Goods">
+        update goods
+        <set>
+            <if test="name != null and name !=''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="pubdate != null and pubdate !=''">
+                pubdate = #{pubdate,jdbcType=DATE},
+            </if>
+            <if test="price != null and price !=''">
+                price = #{price,jdbcType=BIGINT},
+            </if>
+            <if test="star != null and star !=''">
+                star = #{star,jdbcType=INTEGER},
+            </if>
+            <if test="pic != null and pic !=''">
+                pic = #{pic,jdbcType=VARCHAR},
+            </if>
+            <if test="flag != null and flag !=''">
+                flag = #{flag,jdbcType=INTEGER},
+            </if>
+            <if test="cid != null and cid !=''">
+                cid = #{cid,jdbcType=INTEGER},
+            </if>
+            <if test="uid != null and uid !=''">
+                uid = #{uid,jdbcType=INTEGER},
+            </if>
+            <if test="info != null and info !=''">
+                info = #{info,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.qfedu.pojo.Goods">
+    update goods
+    set name = #{name,jdbcType=VARCHAR},
+      pubdate = #{pubdate,jdbcType=DATE},
+      price = #{price,jdbcType=BIGINT},
+      star = #{star,jdbcType=INTEGER},
+      pic = #{pic,jdbcType=VARCHAR},
+      flag = #{flag,jdbcType=INTEGER},
+      cid = #{cid,jdbcType=INTEGER},
+      uid = #{uid,jdbcType=INTEGER},
+      info = #{info,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+    <update id="updateByPrimaryKey" parameterType="com.qfedu.pojo.Goods">
+    update goods
+    set name = #{name,jdbcType=VARCHAR},
+      pubdate = #{pubdate,jdbcType=DATE},
+      price = #{price,jdbcType=BIGINT},
+      star = #{star,jdbcType=INTEGER},
+      pic = #{pic,jdbcType=VARCHAR},
+      flag = #{flag,jdbcType=INTEGER},
+      cid = #{cid,jdbcType=INTEGER},
+      uid = #{uid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+    <insert id="insert" parameterType="Goods">
+        <selectKey keyProperty="id" order="AFTER" resultType="integer">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+
+        insert into goods values(null,#{name},now(),#{price},#{star},#{pic},#{info},0,#{cid},#{uid});
+
+    </insert>
+
+</mapper>
